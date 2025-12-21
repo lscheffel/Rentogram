@@ -3,18 +3,19 @@ const db = require('../database/database');
 class Reservation {
   static create(reservationData, callback) {
     const { property_id, guest_name, guest_email, check_in_date, check_out_date, total_price, status } = reservationData;
-    
+    const statusValue = status || 'pending';
+
     const query = `
-      INSERT INTO reservations 
+      INSERT INTO reservations
       (property_id, guest_name, guest_email, check_in_date, check_out_date, total_price, status)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    
-    db.run(query, [property_id, guest_name, guest_email, check_in_date, check_out_date, total_price, status || 'pending'], function(err) {
+
+    db.run(query, [property_id, guest_name, guest_email, check_in_date, check_out_date, total_price, statusValue], function(err) {
       if (err) {
         return callback(err, null);
       }
-      callback(null, { id: this.lastID, ...reservationData });
+      callback(null, { id: this.lastID, ...reservationData, status: statusValue });
     });
   }
 

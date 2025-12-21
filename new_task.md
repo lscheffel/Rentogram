@@ -267,10 +267,14 @@ O frontend utiliza hooks do React (useState, useEffect) para gerenciamento de es
 - **Autenticação não implementada**: O sistema não possui login/autorização, conforme mencionado em documentação.
 - **Testes ausentes**: Não há testes automatizados implementados.
 
+- Validações aprimoradas implementadas, reduzindo riscos de dados corruptos e inconsistências.
+
 ## Versão
 
-1.0.0
+1.0.1
 
 ## Changelog
 
 - **1.0.0 (2025-12-21)**: Reconstrução inicial da documentação canônica baseada na ingestão do repositório. Consolidação de informações de README.md, DOCUMENTACAO_TECNICA.md e GUIA_DE_USO.md. Identificação de lacunas e inconsistências para futuras correções.
+
+- **1.0.1 (2025-12-21)**: [ARCH] Validações de dados aprimoradas com Joi schemas e integridade referencial implementadas.

@@ -27,17 +27,14 @@ describe('Validation Middleware', () => {
       expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('deve retornar 400 para dados inválidos (título faltando)', () => {
+    it('deve lançar ValidationError para dados inválidos (título faltando)', () => {
       mockReq.body = {
         address: 'Rua da Praia, 123',
         price_per_night: 150.00
       };
 
-      validatePropertyData(mockReq, mockRes, mockNext);
-
-      expect(mockRes.status).toHaveBeenCalledWith(400);
-      expect(mockRes.json).toHaveBeenCalledWith({ error: expect.stringContaining('"title" is required') });
-      expect(mockNext).not.toHaveBeenCalled();
+      expect(() => validatePropertyData(mockReq, mockRes, mockNext)).toThrow(ValidationError);
+      expect(() => validatePropertyData(mockReq, mockRes, mockNext)).toThrow(expect.stringContaining('"title" is required'));
     });
 
     it('deve retornar 400 para preço negativo', () => {

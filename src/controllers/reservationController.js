@@ -1,72 +1,68 @@
 const Reservation = require('../models/Reservation');
+const { DatabaseError, NotFoundError } = require('../errors');
 
 class ReservationController {
-  static createReservation(req, res) {
-    const reservationData = req.body;
-    
-    Reservation.create(reservationData, (err, reservation) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async createReservation(req, res, next) {
+    try {
+      const reservationData = req.body;
+      const reservation = await Reservation.createAsync(reservationData);
       res.status(201).json(reservation);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao criar reserva'));
+    }
   }
 
-  static getAllReservations(req, res) {
-    Reservation.getAll((err, reservations) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async getAllReservations(req, res, next) {
+    try {
+      const reservations = await Reservation.getAllAsync();
       res.status(200).json(reservations);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao buscar reservas'));
+    }
   }
 
-  static getReservationById(req, res) {
-    const { id } = req.params;
-    
-    Reservation.getById(id, (err, reservation) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async getReservationById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const reservation = await Reservation.getByIdAsync(id);
       if (!reservation) {
-        return res.status(404).json({ message: 'Reservation not found' });
+        throw new NotFoundError('Reserva não encontrada');
       }
       res.status(200).json(reservation);
-    });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  static getReservationsByPropertyId(req, res) {
-    const { property_id } = req.params;
-    
-    Reservation.getByPropertyId(property_id, (err, reservations) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async getReservationsByPropertyId(req, res, next) {
+    try {
+      const { property_id } = req.params;
+      const reservations = await Reservation.getByPropertyIdAsync(property_id);
       res.status(200).json(reservations);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao buscar reservas da propriedade'));
+    }
   }
 
-  static updateReservation(req, res) {
-    const { id } = req.params;
-    const reservationData = req.body;
-    
-    Reservation.update(id, reservationData, (err, reservation) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async updateReservation(req, res, next) {
+    try {
+      const { id } = req.params;
+      const reservationData = req.body;
+      const reservation = await Reservation.updateAsync(id, reservationData);
       res.status(200).json(reservation);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao atualizar reserva'));
+    }
   }
 
-  static deleteReservation(req, res) {
-    const { id } = req.params;
-    
-    Reservation.delete(id, (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async deleteReservation(req, res, next) {
+    try {
+      const { id } = req.params;
+      const result = await Reservation.deleteAsync(id);
       res.status(200).json(result);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao deletar reserva'));
+    }
   }
 }
 

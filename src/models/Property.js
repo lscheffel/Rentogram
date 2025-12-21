@@ -1,4 +1,5 @@
 const db = require('../database/database');
+const { promisify } = require('util');
 
 class Property {
   static create(propertyData, callback) {
@@ -68,12 +69,58 @@ class Property {
 
   static delete(id, callback) {
     const query = 'DELETE FROM properties WHERE id = ?';
-    
+
     db.run(query, [id], function(err) {
       if (err) {
         return callback(err, null);
       }
       callback(null, { message: 'Property deleted successfully', affectedRows: this.changes });
+    });
+  }
+
+  // Async methods
+  static createAsync(propertyData) {
+    return new Promise((resolve, reject) => {
+      this.create(propertyData, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static getAllAsync() {
+    return new Promise((resolve, reject) => {
+      this.getAll((err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static getByIdAsync(id) {
+    return new Promise((resolve, reject) => {
+      this.getById(id, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static updateAsync(id, propertyData) {
+    return new Promise((resolve, reject) => {
+      this.update(id, propertyData, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static deleteAsync(id) {
+    return new Promise((resolve, reject) => {
+      this.delete(id, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
     });
   }
 }

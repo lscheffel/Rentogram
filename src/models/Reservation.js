@@ -1,4 +1,5 @@
 const db = require('../database/database');
+const { promisify } = require('util');
 
 class Reservation {
   static create(reservationData, callback) {
@@ -78,12 +79,67 @@ class Reservation {
 
   static delete(id, callback) {
     const query = 'DELETE FROM reservations WHERE id = ?';
-    
+
     db.run(query, [id], function(err) {
       if (err) {
         return callback(err, null);
       }
       callback(null, { message: 'Reservation deleted successfully', affectedRows: this.changes });
+    });
+  }
+
+  // Async methods
+  static createAsync(reservationData) {
+    return new Promise((resolve, reject) => {
+      this.create(reservationData, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static getAllAsync() {
+    return new Promise((resolve, reject) => {
+      this.getAll((err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static getByIdAsync(id) {
+    return new Promise((resolve, reject) => {
+      this.getById(id, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static getByPropertyIdAsync(property_id) {
+    return new Promise((resolve, reject) => {
+      this.getByPropertyId(property_id, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static updateAsync(id, reservationData) {
+    return new Promise((resolve, reject) => {
+      this.update(id, reservationData, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  }
+
+  static deleteAsync(id) {
+    return new Promise((resolve, reject) => {
+      this.delete(id, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
     });
   }
 }

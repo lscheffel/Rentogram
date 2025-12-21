@@ -18,6 +18,10 @@ const reservationRoutes = require('./routes/reservationRoutes');
 app.use('/api/properties', propertyRoutes);
 app.use('/api/reservations', reservationRoutes);
 
+// Middleware de erro global
+const errorHandler = require('./middlewares/errorMiddleware');
+app.use(errorHandler);
+
 // Configuração do banco de dados
 const db = require('./database/database');
 

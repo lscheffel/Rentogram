@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentogram Wiki - Fluxos de Execução</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        .sidebar { height: 100vh; overflow-y: auto; }
+        .content { padding: 20px; }
+        .breadcrumb { margin-bottom: 20px; }
+        .nav-link { color: #007bff; }
+        .nav-link:hover { color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <h5 class="pt-3 px-3">Rentogram Wiki</h5>
+                    <ul class="nav flex-column px-3">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Página Inicial</a></li>
+                        <li class="nav-item"><a class="nav-link" href="architecture.html">Arquitetura do Sistema</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="execution-flows.html">Fluxos de Execução</a></li>
+                        <li class="nav-item"><a class="nav-link" href="data-models.html">Modelos de Dados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="configuration.html">Configuração</a></li>
+                        <li class="nav-item"><a class="nav-link" href="api-reference.html">Referência da API</a></li>
+                        <li class="nav-item"><a class="nav-link" href="usage-guide.html">Guia de Uso</a></li>
+                        <li class="nav-item"><a class="nav-link" href="risks-limitations.html">Riscos e Limitações</a></li>
+                        <li class="nav-item"><a class="nav-link" href="governance.html">Governança</a></li>
+                        <li class="nav-item"><a class="nav-link" href="glossary.html">Glossário</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tags.html">Tags</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Página Inicial</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Fluxos de Execução</li>
+                    </ol>
+                </nav>
+
+                <h1>Fluxos de Execução</h1>
+                <p>Esta seção descreve os fluxos de execução para desenvolvimento, inicialização e operação do sistema Rentogram.</p>
+
+                <h2 id="startup-flow">Fluxo de Inicialização</h2>
+                <div class="mermaid">
+                    flowchart TD
+                        A[Usuário executa start.bat] --> B[Verificar Node.js]
+                        B --> C[Instalar dependências npm]
+                        C --> D[Iniciar backend em background]
+                        D --> E[Abrir navegador em localhost:5274]
+                        E --> F[Backend disponível em localhost:3000]
+                        F --> G[Instalar dependências frontend]
+                        G --> H[Iniciar frontend em localhost:5173]
+                </div>
+
+                <h2 id="development-flow">Fluxo de Desenvolvimento</h2>
+                <div class="mermaid">
+                    flowchart TD
+                        A[Desenvolvedor] --> B[Executar backend: npm run dev]
+                        A --> C[Executar frontend: cd src/frontend && npm run dev]
+                        B --> D[Backend rodando em localhost:3000]
+                        C --> E[Frontend rodando em localhost:5173]
+                        D --> F[Testar integrações API]
+                        E --> F
+                        F --> G[Desenvolver no frontend]
+                        G --> H[Testar mudanças]
+                        H --> I{Mudanças no backend?}
+                        I -->|Sim| J[Reiniciar servidor backend]
+                        I -->|Não| K[Continuar desenvolvimento]
+                        J --> K
+                </div>
+
+                <h2 id="api-interaction-flow">Fluxo de Interação com API</h2>
+                <div class="mermaid">
+                    flowchart TD
+                        A[Frontend Component] --> B[Enviar requisição HTTP]
+                        B --> C[Middleware CORS]
+                        C --> D[Middleware Validação]
+                        D --> E[Controller apropriado]
+                        E --> F[Model]
+                        F --> G[Banco de dados SQLite]
+                        G --> F
+                        F --> E
+                        E --> H[Resposta JSON]
+                        H --> A
+                </div>
+
+                <h2 id="crud-operations">Operações CRUD</h2>
+                <h3>Propriedades</h3>
+                <ul>
+                    <li><strong>Criar:</strong> POST /api/properties → Validação → Inserção no banco → Retorno do ID</li>
+                    <li><strong>Ler:</strong> GET /api/properties → Consulta ao banco → Retorno da lista</li>
+                    <li><strong>Atualizar:</strong> PUT /api/properties/:id → Validação → Update no banco → Retorno dos dados</li>
+                    <li><strong>Excluir:</strong> DELETE /api/properties/:id → Delete no banco → Confirmação</li>
+                </ul>
+
+                <h3>Reservas</h3>
+                <ul>
+                    <li><strong>Criar:</strong> POST /api/reservations → Verificar propriedade existente → Inserção → Retorno</li>
+                    <li><strong>Ler:</strong> GET /api/reservations → Consulta com joins → Retorno da lista</li>
+                    <li><strong>Atualizar:</strong> PUT /api/reservations/:id → Validação → Update → Retorno</li>
+                    <li><strong>Excluir:</strong> DELETE /api/reservations/:id → Delete → Confirmação</li>
+                </ul>
+
+                <h2 id="error-handling">Tratamento de Erros</h2>
+                <p>O sistema implementa tratamento de erros consistente:</p>
+                <ul>
+                    <li>Erros de validação retornam status 400 com mensagens descritivas</li>
+                    <li>Recursos não encontrados retornam status 404</li>
+                    <li>Erros internos retornam status 500 com logs apropriados</li>
+                    <li>Middleware global captura e formata todas as respostas de erro</li>
+                </ul>
+
+                <h2 id="tags">Tags</h2>
+                <p><span class="badge bg-primary">fluxo</span> <span class="badge bg-secondary">execução</span> <span class="badge bg-success">desenvolvimento</span> <span class="badge bg-danger">api</span> <span class="badge bg-warning">crud</span></p>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>

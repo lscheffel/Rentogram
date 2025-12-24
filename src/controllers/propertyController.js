@@ -1,61 +1,58 @@
 const Property = require('../models/Property');
+const { DatabaseError, NotFoundError } = require('../errors');
 
 class PropertyController {
-  static createProperty(req, res) {
-    const propertyData = req.body;
-    
-    Property.create(propertyData, (err, property) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async createProperty(req, res, next) {
+    try {
+      const propertyData = req.body;
+      const property = await Property.createAsync(propertyData);
       res.status(201).json(property);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao criar propriedade'));
+    }
   }
 
-  static getAllProperties(req, res) {
-    Property.getAll((err, properties) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async getAllProperties(req, res, next) {
+    try {
+      const properties = await Property.getAllAsync();
       res.status(200).json(properties);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao buscar propriedades'));
+    }
   }
 
-  static getPropertyById(req, res) {
-    const { id } = req.params;
-    
-    Property.getById(id, (err, property) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async getPropertyById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const property = await Property.getByIdAsync(id);
       if (!property) {
-        return res.status(404).json({ message: 'Property not found' });
+        throw new NotFoundError('Propriedade não encontrada');
       }
       res.status(200).json(property);
-    });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  static updateProperty(req, res) {
-    const { id } = req.params;
-    const propertyData = req.body;
-    
-    Property.update(id, propertyData, (err, property) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async updateProperty(req, res, next) {
+    try {
+      const { id } = req.params;
+      const propertyData = req.body;
+      const property = await Property.updateAsync(id, propertyData);
       res.status(200).json(property);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao atualizar propriedade'));
+    }
   }
 
-  static deleteProperty(req, res) {
-    const { id } = req.params;
-    
-    Property.delete(id, (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  static async deleteProperty(req, res, next) {
+    try {
+      const { id } = req.params;
+      const result = await Property.deleteAsync(id);
       res.status(200).json(result);
-    });
+    } catch (error) {
+      next(new DatabaseError('Erro ao deletar propriedade'));
+    }
   }
 }
 

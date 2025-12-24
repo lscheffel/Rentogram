@@ -2,6 +2,12 @@
 
 Este documento serve como artefato canônico de contexto para o projeto Rentogram, permitindo que qualquer agente inicie o trabalho com conhecimento zero prévio. Ele consolida informações extraídas da ingestão do repositório, incluindo visão geral, arquitetura, configuração e referências essenciais.
 
+## Regras de Governança
+
+1. All planning and execution MUST be organized by PRIORITY-BASED SPRINTS, not time-boxed sprints. A sprint is complete ONLY when its priority objectives are cognitively and technically closed.
+
+2. Time-based sprint assumptions are explicitly DISALLOWED unless explicitly reintroduced by the ORCHESTRATOR.
+
 ## Visão Geral do Projeto
 
 O Rentogram é uma aplicação full-stack para gestão de propriedades de locação e reservas associadas. O sistema permite:
@@ -267,10 +273,134 @@ O frontend utiliza hooks do React (useState, useEffect) para gerenciamento de es
 - **Autenticação não implementada**: O sistema não possui login/autorização, conforme mencionado em documentação.
 - **Testes ausentes**: Não há testes automatizados implementados.
 
+- Validações aprimoradas implementadas, reduzindo riscos de dados corruptos e inconsistências.
+
+## Usable Beta Boundary
+
+✅ **O que o usuário PODE testar:**
+- Navegação na UI completa (Home, Properties, Reservations), interação com calendário, CRUD de propriedades e reservas via UI.
+
+❌ **O que o usuário NÃO PODE testar:**
+
+⚠️ **Limitações conhecidas / rough edges:**
+- Dependências npm do frontend precisam ser instaladas.
+- Banco de dados SQLite local (não persistente em reinicializações, não escalável).
+- Sem autenticação ou autorização implementada.
+
+Esta definição serve como contrato: nada fora dela está em escopo para testes beta.
+
+## Execution Path Consolidation
+
+Para executar o sistema localmente, siga o caminho único e determinístico abaixo:
+
+1. Inicie o backend primeiro executando o comando `npm run dev` no diretório raiz do projeto.
+2. Inicie o frontend executando `cd src/frontend && npm run dev`.
+
+Comportamento de shutdown: Pressione Ctrl+C nos terminais respectivos para parar os processos.
+
+## How to Test This Version
+
+Esta seção fornece instruções passo-a-passo para testar a versão atual do sistema Rentogram, baseada na auditoria, boundary e execução consolidada. Inclui testes da API backend e da UI frontend.
+
+### Pré-requisitos
+- Node.js versão 14 ou superior instalado no sistema.
+
+### Como Iniciar o Sistema
+1. Navegue até o diretório raiz do projeto (`Rentogram`).
+2. Execute o arquivo `start.bat` clicando duas vezes nele ou via linha de comando (`start.bat`).
+   - O script verificará a instalação do Node.js.
+   - Instalará dependências npm se necessário.
+   - Iniciará o backend em segundo plano usando `npm run dev`.
+   - Abrirá o navegador em `http://localhost:5274`.
+3. Aguarde aproximadamente 5 segundos para o servidor iniciar completamente.
+4. O backend estará disponível em `http://localhost:3000`.
+5. Instale dependências do frontend e inicie: `cd src/frontend && npm install && npm run dev`.
+6. O frontend estará disponível em `http://localhost:5173`.
+
+### O que Clicar/Testar
+Use uma ferramenta como Postman para testar os endpoints da API RESTful em `http://localhost:3000/api`. Os endpoints principais são para propriedades e reservas.
+
+#### Testes de Propriedades
+- **GET /properties**: Lista todas as propriedades. Espera-se uma resposta JSON com array de objetos de propriedades.
+- **GET /properties/:id**: Obtém uma propriedade específica por ID. Substitua `:id` por um número válido (ex: 1).
+- **POST /properties**: Cria uma nova propriedade. Use o corpo JSON:
+  ```json
+  {
+    "title": "Apartamento Centro",
+    "description": "Apartamento confortável no centro",
+    "address": "Rua A, 123",
+    "price_per_night": 200.00,
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "max_guests": 4,
+    "amenities": "Wi-Fi, Ar-condicionado",
+    "image_url": "https://example.com/image.jpg"
+  }
+  ```
+- **PUT /properties/:id**: Atualiza uma propriedade existente. Use ID válido e corpo similar ao POST.
+- **DELETE /properties/:id**: Exclui uma propriedade por ID.
+
+#### Testes de Reservas
+- **GET /reservations**: Lista todas as reservas.
+- **GET /reservations/:id**: Obtém uma reserva específica.
+- **GET /reservations/property/:id**: Lista reservas para uma propriedade específica.
+- **POST /reservations**: Cria uma nova reserva. Use o corpo JSON:
+  ```json
+  {
+    "property_id": 1,
+    "guest_name": "João Silva",
+    "guest_email": "joao@example.com",
+    "check_in_date": "2023-12-01",
+    "check_out_date": "2023-12-05",
+    "total_price": 1000.00
+  }
+  ```
+- **PUT /reservations/:id**: Atualiza uma reserva.
+- **DELETE /reservations/:id**: Exclui uma reserva.
+
+#### Testes da UI
+- Navegue pelas páginas Home, Properties e Reservations usando a barra de navegação.
+- Na página Properties, adicione uma nova propriedade preenchendo o formulário e clicando em "Salvar".
+- Edite uma propriedade existente clicando em "Editar", modificando os campos e salvando.
+- Exclua uma propriedade clicando em "Excluir" e confirmando.
+- Na página Reservations, adicione uma nova reserva selecionando uma propriedade, preenchendo datas e informações do hóspede.
+- Edite e exclua reservas de forma similar.
+- Visualize o calendário na página Home ou Reservations para ver ocupações.
+
+### Comportamento Esperado
+- **Respostas bem-sucedidas**: Status HTTP 200 (GET), 201 (POST), 200 (PUT), 204 (DELETE). Respostas em JSON com dados corretos.
+- **Criação/Atualização**: Validações aplicadas; erros retornam status 400 com mensagens de erro.
+- **Banco de dados**: Dados persistidos no arquivo `database.sqlite`.
+- **Edge cases**: Tentativas de criar reservas para propriedades inexistentes retornam erro de integridade referencial.
+
+### Problemas Conhecidos
+- **Porta inconsistente**: O script `start.bat` abre `localhost:5274`, mas a API roda em `3000`; ignore o navegador para testes.
+- **Banco local**: Dados não persistem entre reinicializações completas; reinstalar pode resetar o banco.
+- **Sem autenticação**: Todos os endpoints são públicos; não há controle de acesso.
+- **Dependências do frontend ausentes**: Não tente executar o frontend separadamente.
+
 ## Versão
 
-1.0.0
+1.0.1
 
 ## Changelog
 
 - **1.0.0 (2025-12-21)**: Reconstrução inicial da documentação canônica baseada na ingestão do repositório. Consolidação de informações de README.md, DOCUMENTACAO_TECNICA.md e GUIA_DE_USO.md. Identificação de lacunas e inconsistências para futuras correções.
+
+- **1.0.1 (2025-12-21)**: [ARCH] Validações de dados aprimoradas com Joi schemas e integridade referencial implementadas.
+
+## Versioning and State
+
+**Versão:** 0.2.0-beta
+
+**Nível de Estabilidade:** beta
+
+**Audiência Pretendida:** user validation
+
+## Changelog (Atualizações)
+
+- **[META]** Regras de governança estabelecidas para organização por sprints baseados em prioridade.
+- **[BOOT]** Script de inicialização (start.bat) criado para facilitar execução do sistema.
+- **[DOC]** Documentação canônica consolidada, incluindo visão geral, arquitetura e guias de uso.
+- **[USABILITY]** Melhorias na usabilidade com validações aprimoradas e interface de teste definida.
+- **[FRONTEND]** Implementação do frontend runnable.

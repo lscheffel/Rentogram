@@ -52,13 +52,24 @@ O sistema Rentogram segue uma arquitetura cliente-servidor com separação clara
 ### Estrutura de Diretórios
 
 ```
-/src
+src/
 ├── config/            # Configurações da aplicação
+│   ├── config.js      # Configurações gerais (CORS, etc.)
+│   └── logger.js      # Configuração de logging com Winston
 ├── controllers/       # Controladores da API
 ├── database/          # Configuração do banco de dados
+├── errors/            # Classes de erro customizadas
+│   ├── AppError.js
+│   ├── DatabaseError.js
+│   ├── NotFoundError.js
+│   └── ValidationError.js
 ├── middlewares/       # Middlewares
+│   ├── errorMiddleware.js  # Tratamento global de erros
+│   └── validationMiddleware.js  # Validação de dados com Joi
 ├── models/            # Modelos de dados
 ├── routes/            # Rotas da API
+├── validators/        # Schemas de validação Joi
+│   └── schemas.js
 └── server.js          # Servidor principal
 ```
 
@@ -68,11 +79,20 @@ O sistema Rentogram segue uma arquitetura cliente-servidor com separação clara
 
 ```javascript
 class Property {
+  // Métodos síncronos com callbacks
   static create(propertyData, callback)
-  static getAll(callback)
+  static getAll(callback, page = 1, limit = null)
   static getById(id, callback)
+  static getByIdWithReservations(id, callback)
   static update(id, propertyData, callback)
   static delete(id, callback)
+
+  // Métodos assíncronos com Promises
+  static createAsync(propertyData)
+  static getAllAsync()
+  static getByIdAsync(id)
+  static updateAsync(id, propertyData)
+  static deleteAsync(id)
 }
 ```
 
@@ -94,12 +114,21 @@ class Property {
 
 ```javascript
 class Reservation {
+  // Métodos síncronos com callbacks
   static create(reservationData, callback)
   static getAll(callback)
   static getById(id, callback)
   static getByPropertyId(property_id, callback)
   static update(id, reservationData, callback)
   static delete(id, callback)
+
+  // Métodos assíncronos com Promises
+  static createAsync(reservationData)
+  static getAllAsync()
+  static getByIdAsync(id)
+  static getByPropertyIdAsync(property_id)
+  static updateAsync(id, reservationData)
+  static deleteAsync(id)
 }
 ```
 
@@ -121,30 +150,30 @@ class Reservation {
 
 ```javascript
 class PropertyController {
-  static createProperty(req, res)
-  static getAllProperties(req, res)
-  static getPropertyById(req, res)
-  static updateProperty(req, res)
-  static deleteProperty(req, res)
+  static async createProperty(req, res, next)
+  static async getAllProperties(req, res, next)
+  static async getPropertyById(req, res, next)
+  static async updateProperty(req, res, next)
+  static async deleteProperty(req, res, next)
 }
 ```
 
 **Responsabilidades:**
 - Receber requisições HTTP
-- Validar dados de entrada
-- Chamar métodos do modelo
-- Enviar respostas HTTP
+- Validar dados de entrada via middlewares
+- Chamar métodos assíncronos do modelo
+- Enviar respostas HTTP ou passar erros para o middleware global
 
 #### ReservationController
 
 ```javascript
 class ReservationController {
-  static createReservation(req, res)
-  static getAllReservations(req, res)
-  static getReservationById(req, res)
-  static getReservationsByPropertyId(req, res)
-  static updateReservation(req, res)
-  static deleteReservation(req, res)
+  static async createReservation(req, res, next)
+  static async getAllReservations(req, res, next)
+  static async getReservationById(req, res, next)
+  static async getReservationsByPropertyId(req, res, next)
+  static async updateReservation(req, res, next)
+  static async deleteReservation(req, res, next)
 }
 ```
 
@@ -176,60 +205,112 @@ router.delete('/:id', ReservationController.deleteReservation)
 #### ValidationMiddleware
 
 ```javascript
-function validatePropertyData(req, res, next) {
-  // Validação dos dados da propriedade
-  // Verifica campos obrigatórios
-  // Valida formatos de dados
-  // Chama next() se válido ou envia erro
+async function validatePropertyData(req, res, next) {
+  const { error } = propertySchema.validate(req.body);
+  if (error) {
+    return next(new ValidationError(error.details[0].message));
+  }
+  next();
 }
 
-function validateReservationData(req, res, next) {
-  // Validação dos dados da reserva
-  // Verifica campos obrigatórios
-  // Valida formatos de dados (email, datas)
-  // Chama next() se válido ou envia erro
+async function validateReservationData(req, res, next) {
+  const { error } = reservationSchema.validate(req.body);
+  if (error) {
+    throw new ValidationError(error.details[0].message);
+  }
+
+  // Validação de integridade referencial
+  const { property_id } = req.body;
+  const property = await Property.getByIdAsync(property_id);
+  if (!property) {
+    throw new ValidationError('Propriedade inválida: propriedade não existe');
+  }
+  next();
 }
 ```
+
+**Validações implementadas:**
+- Uso de Joi para schemas de validação
+- Campos obrigatórios e formatos (email, datas, números)
+- Validação de integridade referencial para reservas
+
+#### ErrorMiddleware
+
+```javascript
+const errorHandler = (err, req, res, next) => {
+  // Log do erro com Winston
+  logger.error(err.message, {
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip,
+  });
+
+  // Tratamento específico de erros
+  // Resposta padronizada
+  res.status(error.statusCode || 500).json({
+    success: false,
+    error: error.message || 'Erro interno do servidor',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+  });
+};
+```
+
+**Tratamento de erros:**
+- Logging estruturado com Winston
+- Tratamento de erros específicos (Joi, SQLite, etc.)
+- Respostas padronizadas com códigos HTTP apropriados
 
 ## Arquitetura do Frontend
 
 ### Estrutura de Componentes
 
 ```
-/src/frontend
+src/frontend
 ├── components/     # Componentes reutilizáveis
 │   └── Navbar.tsx  # Barra de navegação
 ├── pages/          # Páginas da aplicação
 │   ├── Home.tsx     # Dashboard
 │   ├── Properties.tsx # Gestão de propriedades
 │   └── Reservations.tsx # Gestão de reservas
-├── config.ts       # Configurações
-├── App.tsx         # Componente principal
-└── index.tsx       # Ponto de entrada
+├── config.ts       # Configurações da API
+├── theme.ts        # Definições de tema (light/dark)
+├── ThemeContext.tsx # Contexto para gerenciamento de tema
+├── App.tsx         # Componente principal com roteamento
+├── index.tsx       # Ponto de entrada
+├── index.html      # Template HTML
+├── styles.css      # Estilos globais
+└── package.json    # Dependências do frontend
 ```
 
 ### Gerenciamento de Estado
 
-O frontend utiliza React hooks para gerenciamento de estado:
+O frontend utiliza React hooks para gerenciamento de estado local e Context API para estado global:
 
 ```typescript
+// Estado local em componentes
 const [properties, setProperties] = useState<Property[]>([])
 const [reservations, setReservations] = useState<Reservation[]>([])
 const [loading, setLoading] = useState<boolean>(true)
 const [error, setError] = useState<string | null>(null)
+
+// Contexto para tema (light/dark mode)
+const { isDarkMode, toggleTheme } = useTheme()
 ```
 
 ### Comunicação com a API
 
-O frontend se comunica com o backend usando a API REST:
+O frontend se comunica com o backend usando a API REST, com endpoints centralizados em `config.ts`:
 
 ```typescript
+import { API_ENDPOINTS } from './config'
+
 // Exemplo de requisição para obter propriedades
-const response = await fetch('http://localhost:3000/api/properties')
+const response = await fetch(API_ENDPOINTS.PROPERTIES)
 const propertiesData = await response.json()
 
 // Exemplo de requisição para criar reserva
-const response = await fetch('http://localhost:3000/api/reservations', {
+const response = await fetch(API_ENDPOINTS.RESERVATIONS, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(reservationData)
@@ -571,17 +652,16 @@ Properties (1) ┬─┬ Reservations (N)
        ├──────────────────>│                   │                   │
        │                   │ validatePropertyData()           │
        │                   ├──────────────────>│                   │
-       │                   │                   │ create()          │
+       │                   │ await Property.createAsync()     │
        │                   ├──────────────────>│                   │
        │                   │                   │ INSERT INTO properties
        │                   │                   ├──────────────────>│
        │                   │                   │                   │
        │                   │                   │ <──────────────────┤
        │                   │                   │                   │
-       │                   │                   │ callback(null, property)
        │                   │<──────────────────┤                   │
        │                   │                   │                   │
-       │                   │ res.status(201).json(property)
+       │ res.status(201).json(property)
        │<──────────────────┤                   │                   │
        │                   │                   │                   │
 ```
@@ -598,37 +678,66 @@ Properties (1) ┬─┬ Reservations (N)
        ├──────────────────>│                   │                   │
        │                   │ validateReservationData()       │
        │                   ├──────────────────>│                   │
-       │                   │                   │ create()          │
+       │                   │ await Reservation.createAsync() │
        │                   ├──────────────────>│                   │
        │                   │                   │ INSERT INTO reservations
        │                   │                   ├──────────────────>│
        │                   │                   │                   │
        │                   │                   │ <──────────────────┤
        │                   │                   │                   │
-       │                   │                   │ callback(null, reservation)
        │                   │<──────────────────┤                   │
        │                   │                   │                   │
-       │                   │ res.status(201).json(reservation)
+       │ res.status(201).json(reservation)
        │<──────────────────┤                   │                   │
        │                   │                   │                   │
 ```
+
+## Tratamento de Erros
+
+### Classes de Erro Customizadas
+
+O sistema implementa classes de erro customizadas para melhor tratamento e padronização:
+
+- **AppError**: Classe base para erros da aplicação
+- **DatabaseError**: Erros relacionados ao banco de dados
+- **NotFoundError**: Recurso não encontrado (404)
+- **ValidationError**: Dados inválidos (400)
+
+### Middleware de Tratamento de Erros
+
+```javascript
+const errorHandler = (err, req, res, next) => {
+  // Log estruturado com Winston
+  logger.error(err.message, { stack: err.stack, url: req.url });
+
+  // Tratamento específico por tipo de erro
+  // Respostas padronizadas com códigos HTTP apropriados
+};
+```
+
+**Características:**
+- Logging estruturado com Winston
+- Tratamento de erros específicos (Joi, SQLite, etc.)
+- Respostas padronizadas sem exposição de detalhes internos
+- Stack trace em desenvolvimento
 
 ## Segurança
 
 ### Medidas de Segurança Atuais
 
 1. **Validação de Dados:**
-   - Middlewares de validação para todos os endpoints
-   - Verificação de campos obrigatórios
-   - Validação de formatos (email, datas, números)
+    - Schemas Joi para validação rigorosa
+    - Validação de integridade referencial
+    - Verificação de campos obrigatórios e formatos
 
 2. **CORS:**
-   - Configurado para permitir apenas origens específicas
-   - Previne requisições de domínios não autorizados
+    - Configurado para permitir apenas origens específicas
+    - Previne requisições de domínios não autorizados
 
 3. **Tratamento de Erros:**
-   - Respostas padronizadas para erros
-   - Não expõe detalhes internos do servidor
+    - Respostas padronizadas para erros
+    - Não expõe detalhes internos do servidor
+    - Logging seguro de erros
 
 ### Melhorias de Segurança Recomendadas
 
@@ -693,15 +802,17 @@ O sistema implementa testes automatizados usando Jest como framework de testes, 
 #### Testes Implementados
 
 1. **Backend:**
-    - Testes unitários para controladores (propertyController, reservationController)
-    - Testes para middlewares de validação
-    - Testes para modelos de dados
+     - Testes unitários para controladores (propertyController, reservationController)
+     - Testes para middlewares de validação com Joi
+     - Testes para modelos de dados
+     - Testes de integração para rotas
 
 2. **Frontend:**
-    - Testes ainda não implementados (recomendado para futuras iterações)
+     - Testes ainda não implementados (recomendado para futuras iterações)
 
 3. **Banco de Dados:**
-    - Validação de esquema através de testes de modelos
+     - Validação de esquema através de testes de modelos
+     - Testes de integridade referencial
 
 ### Melhorias de Testes Recomendadas
 

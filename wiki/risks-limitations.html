@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentogram Wiki - Riscos e Limitações</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar { height: 100vh; overflow-y: auto; }
+        .content { padding: 20px; }
+        .breadcrumb { margin-bottom: 20px; }
+        .nav-link { color: #007bff; }
+        .nav-link:hover { color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <h5 class="pt-3 px-3">Rentogram Wiki</h5>
+                    <ul class="nav flex-column px-3">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Página Inicial</a></li>
+                        <li class="nav-item"><a class="nav-link" href="architecture.html">Arquitetura do Sistema</a></li>
+                        <li class="nav-item"><a class="nav-link" href="execution-flows.html">Fluxos de Execução</a></li>
+                        <li class="nav-item"><a class="nav-link" href="data-models.html">Modelos de Dados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="configuration.html">Configuração</a></li>
+                        <li class="nav-item"><a class="nav-link" href="api-reference.html">Referência da API</a></li>
+                        <li class="nav-item"><a class="nav-link" href="usage-guide.html">Guia de Uso</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="risks-limitations.html">Riscos e Limitações</a></li>
+                        <li class="nav-item"><a class="nav-link" href="governance.html">Governança</a></li>
+                        <li class="nav-item"><a class="nav-link" href="glossary.html">Glossário</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tags.html">Tags</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Página Inicial</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Riscos e Limitações</li>
+                    </ol>
+                </nav>
+
+                <h1>Riscos e Limitações</h1>
+                <p>Esta seção identifica os riscos conhecidos e limitações do sistema Rentogram.</p>
+
+                <h2 id="known-limitations">Limitações Conhecidas</h2>
+                <ul>
+                    <li><strong>Banco de dados local:</strong> SQLite não é escalável para produção com múltiplos usuários.</li>
+                    <li><strong>Sem autenticação:</strong> Não há controle de acesso ou autorização implementado.</li>
+                    <li><strong>Frontend limitado:</strong> Interface básica sem recursos avançados de UX.</li>
+                    <li><strong>Testes ausentes:</strong> Não há suite de testes automatizados.</li>
+                    <li><strong>Validações básicas:</strong> Validações de dados podem ser insuficientes para cenários complexos.</li>
+                </ul>
+
+                <h2 id="security-risks">Riscos de Segurança</h2>
+                <ul>
+                    <li><strong>SQL Injection:</strong> Embora usando prepared statements, há risco se não forem usados corretamente.</li>
+                    <li><strong>CORS:</strong> Configuração permite qualquer origem em desenvolvimento.</li>
+                    <li><strong>Dados sensíveis:</strong> Informações de hóspedes não são criptografadas.</li>
+                </ul>
+
+                <h2 id="performance">Limitações de Performance</h2>
+                <ul>
+                    <li><strong>Escalabilidade:</strong> Arquitetura não suporta horizontal scaling.</li>
+                    <li><strong>Queries:</strong> Consultas N+1 podem ocorrer sem otimizações.</li>
+                    <li><strong>Frontend:</strong> Sem otimização de bundle ou lazy loading.</li>
+                </ul>
+
+                <h2 id="future-improvements">Melhorias Futuras</h2>
+                <ul>
+                    <li>Implementar autenticação e autorização</li>
+                    <li>Migrar para banco de dados relacional escalável (PostgreSQL)</li>
+                    <li>Adicionar testes automatizados</li>
+                    <li>Melhorar interface de usuário</li>
+                    <li>Implementar cache e otimização de performance</li>
+                </ul>
+
+                <h2 id="tags">Tags</h2>
+                <p><span class="badge bg-primary">riscos</span> <span class="badge bg-secondary">limitações</span> <span class="badge bg-danger">segurança</span> <span class="badge bg-warning">performance</span></p>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentogram Wiki - Modelos de Dados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar { height: 100vh; overflow-y: auto; }
+        .content { padding: 20px; }
+        .breadcrumb { margin-bottom: 20px; }
+        .nav-link { color: #007bff; }
+        .nav-link:hover { color: #0056b3; }
+        table { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <h5 class="pt-3 px-3">Rentogram Wiki</h5>
+                    <ul class="nav flex-column px-3">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Página Inicial</a></li>
+                        <li class="nav-item"><a class="nav-link" href="architecture.html">Arquitetura do Sistema</a></li>
+                        <li class="nav-item"><a class="nav-link" href="execution-flows.html">Fluxos de Execução</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="data-models.html">Modelos de Dados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="configuration.html">Configuração</a></li>
+                        <li class="nav-item"><a class="nav-link" href="api-reference.html">Referência da API</a></li>
+                        <li class="nav-item"><a class="nav-link" href="usage-guide.html">Guia de Uso</a></li>
+                        <li class="nav-item"><a class="nav-link" href="risks-limitations.html">Riscos e Limitações</a></li>
+                        <li class="nav-item"><a class="nav-link" href="governance.html">Governança</a></li>
+                        <li class="nav-item"><a class="nav-link" href="glossary.html">Glossário</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tags.html">Tags</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Página Inicial</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Modelos de Dados</li>
+                    </ol>
+                </nav>
+
+                <h1>Modelos de Dados</h1>
+                <p>O sistema utiliza SQLite como banco de dados relacional, com duas tabelas principais: <code>properties</code> e <code>reservations</code>.</p>
+
+                <h2 id="database-schema">Esquema do Banco de Dados</h2>
+
+                <h3>Tabela <code>properties</code></h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Campo</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Restrições</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>INTEGER</td>
+                            <td>Chave primária auto-incrementada</td>
+                            <td>PRIMARY KEY, AUTOINCREMENT</td>
+                        </tr>
+                        <tr>
+                            <td><code>title</code></td>
+                            <td>TEXT</td>
+                            <td>Título da propriedade</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>description</code></td>
+                            <td>TEXT</td>
+                            <td>Descrição detalhada</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><code>address</code></td>
+                            <td>TEXT</td>
+                            <td>Endereço completo</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>price_per_night</code></td>
+                            <td>REAL</td>
+                            <td>Preço por noite</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>bedrooms</code></td>
+                            <td>INTEGER</td>
+                            <td>Número de quartos</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><code>bathrooms</code></td>
+                            <td>INTEGER</td>
+                            <td>Número de banheiros</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><code>max_guests</code></td>
+                            <td>INTEGER</td>
+                            <td>Máximo de hóspedes</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><code>amenities</code></td>
+                            <td>TEXT</td>
+                            <td>Comodidades (string separada por vírgulas)</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><code>image_url</code></td>
+                            <td>TEXT</td>
+                            <td>URL da imagem principal</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at</code></td>
+                            <td>TIMESTAMP</td>
+                            <td>Data de criação</td>
+                            <td>DEFAULT CURRENT_TIMESTAMP</td>
+                        </tr>
+                        <tr>
+                            <td><code>updated_at</code></td>
+                            <td>TIMESTAMP</td>
+                            <td>Data de atualização</td>
+                            <td>DEFAULT CURRENT_TIMESTAMP</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Tabela <code>reservations</code></h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Campo</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Restrições</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>INTEGER</td>
+                            <td>Chave primária auto-incrementada</td>
+                            <td>PRIMARY KEY, AUTOINCREMENT</td>
+                        </tr>
+                        <tr>
+                            <td><code>property_id</code></td>
+                            <td>INTEGER</td>
+                            <td>Referência à propriedade</td>
+                            <td>FOREIGN KEY REFERENCES properties(id)</td>
+                        </tr>
+                        <tr>
+                            <td><code>guest_name</code></td>
+                            <td>TEXT</td>
+                            <td>Nome do hóspede</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>guest_email</code></td>
+                            <td>TEXT</td>
+                            <td>Email do hóspede</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>check_in_date</code></td>
+                            <td>TEXT</td>
+                            <td>Data de check-in (YYYY-MM-DD)</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>check_out_date</code></td>
+                            <td>TEXT</td>
+                            <td>Data de check-out (YYYY-MM-DD)</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>total_price</code></td>
+                            <td>REAL</td>
+                            <td>Preço total da reserva</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>TEXT</td>
+                            <td>Status da reserva</td>
+                            <td>DEFAULT 'pending'</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at</code></td>
+                            <td>TIMESTAMP</td>
+                            <td>Data de criação</td>
+                            <td>DEFAULT CURRENT_TIMESTAMP</td>
+                        </tr>
+                        <tr>
+                            <td><code>updated_at</code></td>
+                            <td>TIMESTAMP</td>
+                            <td>Data de atualização</td>
+                            <td>DEFAULT CURRENT_TIMESTAMP</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 id="relationships">Relacionamentos</h2>
+                <ul>
+                    <li><code>reservations.property_id</code> referencia <code>properties.id</code></li>
+                    <li>Relação: Uma propriedade pode ter múltiplas reservas (1:N)</li>
+                    <li>Integridade referencial: Não é possível criar reserva para propriedade inexistente</li>
+                </ul>
+
+                <h2 id="data-validation">Validação de Dados</h2>
+                <p>O sistema implementa validação usando Joi schemas:</p>
+                <ul>
+                    <li>Campos obrigatórios são validados na criação/atualização</li>
+                    <li>Tipos de dados são verificados (string, number, date)</li>
+                    <li>Formato de email é validado</li>
+                    <li>Datas são verificadas para formato YYYY-MM-DD</li>
+                    <li>Preços devem ser números positivos</li>
+                </ul>
+
+                <h2 id="tags">Tags</h2>
+                <p><span class="badge bg-primary">dados</span> <span class="badge bg-secondary">banco</span> <span class="badge bg-success">sqlite</span> <span class="badge bg-danger">schema</span> <span class="badge bg-warning">validação</span></p>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

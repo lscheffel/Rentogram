@@ -5,18 +5,30 @@ interface Property {
   title: string;
   description: string;
   address: string;
-  price: number;
+  price_per_night: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  max_guests?: number;
+  amenities?: string;
+  image_url?: string;
 }
+
+type FormData = Omit<Property, 'amenities'> & { amenities: string };
 
 const Properties: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Property>({
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
     address: '',
-    price: 0
+    price_per_night: 0,
+    bedrooms: 0,
+    bathrooms: 0,
+    max_guests: 1,
+    amenities: '',
+    image_url: ''
   });
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -41,24 +53,49 @@ const Properties: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    let processedValue: any = value;
+    if (['price_per_night', 'bedrooms', 'bathrooms', 'max_guests'].includes(name)) {
+      processedValue = parseFloat(value) || 0;
+    }
+    setFormData(prev => ({ ...prev, [name]: processedValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validação client-side
+    if (!formData.title.trim() || !formData.description.trim() || !formData.address.trim() || formData.price_per_night <= 0) {
+      setError('Preencha todos os campos obrigatórios corretamente.');
+      return;
+    }
+
+    if (!formData.amenities.trim()) {
+      setError('Adicione pelo menos uma comodidade.');
+      return;
+    }
+
     try {
+      // Omitir campos opcionais vazios
+      const payload = Object.fromEntries(
+        Object.entries(formData).filter(([key, value]) => {
+          if (['bedrooms', 'bathrooms', 'max_guests', 'amenities', 'image_url'].includes(key)) {
+            return value !== '' && value !== 0;
+          }
+          return true;
+        })
+      );
       let response;
       if (editingId) {
         response = await fetch(`http://localhost:3000/api/properties/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
       } else {
         response = await fetch('http://localhost:3000/api/properties', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
       }
 
@@ -74,7 +111,10 @@ const Properties: React.FC = () => {
   };
 
   const handleEdit = (property: Property) => {
-    setFormData(property);
+    setFormData({
+      ...property,
+      amenities: property.amenities || ''
+    });
     setEditingId(property.id || null);
   };
 
@@ -99,7 +139,12 @@ const Properties: React.FC = () => {
       title: '',
       description: '',
       address: '',
-      price: 0
+      price_per_night: 0,
+      bedrooms: 0,
+      bathrooms: 0,
+      max_guests: 1,
+      amenities: '',
+      image_url: ''
     });
     setEditingId(null);
   };
@@ -170,16 +215,40 @@ const Properties: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="price" className="form-label">Preço (R$)</label>
+                  <label htmlFor="price_per_night" className="form-label">Preço por Noite (R$)</label>
                   <input
                     type="number"
                     className="form-control"
-                    id="price"
-                    name="price"
-                    value={formData.price}
+                    id="price_per_night"
+                    name="price_per_night"
+                    value={formData.price_per_night}
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="bedrooms" className="form-label">Quartos</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="bedrooms"
+                    name="bedrooms"
+                    value={formData.bedrooms}
+                    onChange={handleInputChange}
+                    min="0"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="amenities" className="form-label">Comodidades (separadas por vírgula)</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="amenities"
+                    name="amenities"
+                    value={formData.amenities}
+                    onChange={handleInputChange}
                     required
                   />
                 </div>
@@ -210,7 +279,7 @@ const Properties: React.FC = () => {
                       <tr>
                         <th>Título</th>
                         <th>Endereço</th>
-                        <th>Preço</th>
+                        <th>Preço por Noite</th>
                         <th>Ações</th>
                       </tr>
                     </thead>
@@ -219,7 +288,7 @@ const Properties: React.FC = () => {
                         <tr key={property.id}>
                           <td>{property.title}</td>
                           <td>{property.address}</td>
-                          <td>R$ {property.price?.toFixed(2)}</td>
+                          <td>R$ {property.price_per_night?.toFixed(2)}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <button

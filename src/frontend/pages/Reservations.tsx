@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 interface Property {
   id: number;
   title: string;
+  price_per_night: number;
 }
 
 interface Reservation {
@@ -13,6 +14,25 @@ interface Reservation {
   guestName: string;
   guestEmail: string;
 }
+
+interface ReservationFromAPI {
+  id?: number;
+  property_id: number;
+  check_in_date: string;
+  check_out_date: string;
+  guest_name: string;
+  guest_email: string;
+}
+
+const calculateTotalPrice = (propertyId: number, startDate: string, endDate: string, properties: Property[]): number => {
+  const property = properties.find(p => p.id === propertyId);
+  if (!property) return 0;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays * property.price_per_night;
+};
 
 const Reservations: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -43,10 +63,17 @@ const Reservations: React.FC = () => {
         throw new Error('Failed to fetch data');
       }
 
-      const reservationsData = await reservationsResponse.json();
+      const reservationsData: ReservationFromAPI[] = await reservationsResponse.json();
       const propertiesData = await propertiesResponse.json();
 
-      setReservations(reservationsData);
+      setReservations(reservationsData.map(r => ({
+        id: r.id,
+        propertyId: r.property_id,
+        startDate: r.check_in_date,
+        endDate: r.check_out_date,
+        guestName: r.guest_name,
+        guestEmail: r.guest_email
+      })));
       setProperties(propertiesData);
       setLoading(false);
     } catch (err) {
@@ -57,24 +84,57 @@ const Reservations: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    let processedValue: any = value;
+    if (name === 'propertyId') {
+      processedValue = parseInt(value, 10) || 0;
+    }
+    setFormData(prev => ({ ...prev, [name]: processedValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validações client-side
+    if (!formData.propertyId || !formData.startDate || !formData.endDate || !formData.guestName.trim() || !formData.guestEmail.trim()) {
+      setError('Preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const start = new Date(formData.startDate);
+    const end = new Date(formData.endDate);
+    if (end <= start) {
+      setError('A data de término deve ser posterior à data de início.');
+      return;
+    }
+
+    const totalPrice = calculateTotalPrice(formData.propertyId, formData.startDate, formData.endDate, properties);
+    if (totalPrice <= 0) {
+      setError('Erro no cálculo do preço total. Verifique as datas e o imóvel selecionado.');
+      return;
+    }
+
     try {
+      const payload = {
+        property_id: formData.propertyId,
+        check_in_date: formData.startDate,
+        check_out_date: formData.endDate,
+        guest_name: formData.guestName,
+        guest_email: formData.guestEmail,
+        total_price: totalPrice
+      };
+
       let response;
       if (editingId) {
         response = await fetch(`http://localhost:3000/api/reservations/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
       } else {
         response = await fetch('http://localhost:3000/api/reservations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
       }
 

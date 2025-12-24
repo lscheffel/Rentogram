@@ -5,7 +5,7 @@ const { ValidationError, NotFoundError } = require('../errors');
 async function validatePropertyData(req, res, next) {
   const { error } = propertySchema.validate(req.body);
   if (error) {
-    throw new ValidationError(error.details[0].message);
+    return next(new ValidationError(error.details[0].message));
   }
   next();
 }

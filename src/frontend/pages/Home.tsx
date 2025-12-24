@@ -39,8 +39,17 @@ const Home: React.FC = () => {
         const propertiesData = await propertiesResponse.json();
         const reservationsData = await reservationsResponse.json();
 
+        // Map snake_case to camelCase
+        const mappedReservations = reservationsData.map((res: any) => ({
+          id: res.id,
+          propertyId: res.property_id,
+          startDate: res.check_in_date,
+          endDate: res.check_out_date,
+          guestName: res.guest_name,
+        }));
+
         setProperties(propertiesData);
-        setReservations(reservationsData);
+        setReservations(mappedReservations);
         setLoading(false);
       } catch (err) {
         setError('Failed to load data. Please try again later.');

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentogram Wiki - Configuração</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar { height: 100vh; overflow-y: auto; }
+        .content { padding: 20px; }
+        .breadcrumb { margin-bottom: 20px; }
+        .nav-link { color: #007bff; }
+        .nav-link:hover { color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <h5 class="pt-3 px-3">Rentogram Wiki</h5>
+                    <ul class="nav flex-column px-3">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Página Inicial</a></li>
+                        <li class="nav-item"><a class="nav-link" href="architecture.html">Arquitetura do Sistema</a></li>
+                        <li class="nav-item"><a class="nav-link" href="execution-flows.html">Fluxos de Execução</a></li>
+                        <li class="nav-item"><a class="nav-link" href="data-models.html">Modelos de Dados</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="configuration.html">Configuração</a></li>
+                        <li class="nav-item"><a class="nav-link" href="api-reference.html">Referência da API</a></li>
+                        <li class="nav-item"><a class="nav-link" href="usage-guide.html">Guia de Uso</a></li>
+                        <li class="nav-item"><a class="nav-link" href="risks-limitations.html">Riscos e Limitações</a></li>
+                        <li class="nav-item"><a class="nav-link" href="governance.html">Governança</a></li>
+                        <li class="nav-item"><a class="nav-link" href="glossary.html">Glossário</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tags.html">Tags</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Página Inicial</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Configuração</li>
+                    </ol>
+                </nav>
+
+                <h1>Configuração</h1>
+                <p>Esta seção descreve como configurar o ambiente de desenvolvimento e produção do Rentogram.</p>
+
+                <h2 id="prerequisites">Pré-requisitos</h2>
+                <ul>
+                    <li>Node.js versão 14 ou superior</li>
+                    <li>npm ou yarn</li>
+                    <li>SQLite (incluído automaticamente)</li>
+                </ul>
+
+                <h2 id="environment-variables">Variáveis de Ambiente</h2>
+                <p>Arquivo <code>.env</code> na raiz do projeto:</p>
+                <pre><code>PORT=3000
+NODE_ENV=development</code></pre>
+
+                <h3>Variáveis Disponíveis</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Variável</th>
+                            <th>Descrição</th>
+                            <th>Padrão</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>PORT</code></td>
+                            <td>Porta do servidor backend</td>
+                            <td>3000</td>
+                        </tr>
+                        <tr>
+                            <td><code>NODE_ENV</code></td>
+                            <td>Ambiente de execução</td>
+                            <td>development</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 id="frontend-config">Configuração do Frontend</h2>
+                <p>Arquivo <code>src/frontend/config.ts</code>:</p>
+                <pre><code>export const API_ENDPOINTS = {
+  PROPERTIES: '/api/properties',
+  RESERVATIONS: '/api/reservations'
+};
+
+export const API_BASE_URL = 'http://localhost:3000';</code></pre>
+
+                <h2 id="backend-config">Configuração do Backend</h2>
+                <p>Arquivo <code>src/config/config.js</code>:</p>
+                <pre><code>module.exports = {
+  cors: {
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    credentials: true
+  }
+};</code></pre>
+
+                <h2 id="database-init">Inicialização do Banco de Dados</h2>
+                <p>O banco SQLite é criado automaticamente na primeira execução. O schema é definido em <code>src/database/database.js</code>.</p>
+
+                <h2 id="tags">Tags</h2>
+                <p><span class="badge bg-primary">configuração</span> <span class="badge bg-secondary">ambiente</span> <span class="badge bg-success">variáveis</span> <span class="badge bg-danger">banco</span></p>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

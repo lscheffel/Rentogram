@@ -1,4 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
 
 interface Property {
   id: number;
@@ -183,166 +205,169 @@ const Reservations: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center mt-5">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Carregando...</span>
-        </div>
-      </div>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="alert alert-danger" role="alert">
+      <Alert severity="error" sx={{ mb: 2 }}>
         {error}
-      </div>
+      </Alert>
     );
   }
 
   return (
-    <div>
-      <h1 className="mb-4">Gerenciamento de Reservas</h1>
-      <div className="row">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">
-              <h5>{editingId ? 'Editar Reserva' : 'Nova Reserva'}</h5>
-            </div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="propertyId" className="form-label">Imóvel</label>
-                  <select
-                    className="form-select"
+    <Box>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Gerenciamento de Reservas
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                {editingId ? 'Editar Reserva' : 'Nova Reserva'}
+              </Typography>
+              <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <FormControl fullWidth required>
+                  <InputLabel id="propertyId-label">Imóvel</InputLabel>
+                  <Select
+                    labelId="propertyId-label"
                     id="propertyId"
                     name="propertyId"
                     value={formData.propertyId}
                     onChange={handleInputChange}
-                    required
+                    label="Imóvel"
                   >
-                    <option value="">Selecione um imóvel</option>
+                    <MenuItem value="">
+                      <em>Selecione um imóvel</em>
+                    </MenuItem>
                     {properties.map(property => (
-                      <option key={property.id} value={property.id}>{property.title}</option>
+                      <MenuItem key={property.id} value={property.id}>
+                        {property.title}
+                      </MenuItem>
                     ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="startDate" className="form-label">Data de Início</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="startDate"
-                    name="startDate"
-                    value={formData.startDate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="endDate" className="form-label">Data de Término</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="endDate"
-                    name="endDate"
-                    value={formData.endDate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="guestName" className="form-label">Nome do Hóspede</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="guestName"
-                    name="guestName"
-                    value={formData.guestName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="guestEmail" className="form-label">Email do Hóspede</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="guestEmail"
-                    name="guestEmail"
-                    value={formData.guestEmail}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="d-flex gap-2">
-                  <button type="submit" className="btn btn-primary">
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Data de Início"
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={handleInputChange}
+                  InputLabelProps={{ shrink: true }}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="Data de Término"
+                  id="endDate"
+                  name="endDate"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={handleInputChange}
+                  InputLabelProps={{ shrink: true }}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="Nome do Hóspede"
+                  id="guestName"
+                  name="guestName"
+                  value={formData.guestName}
+                  onChange={handleInputChange}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="Email do Hóspede"
+                  id="guestEmail"
+                  name="guestEmail"
+                  type="email"
+                  value={formData.guestEmail}
+                  onChange={handleInputChange}
+                  required
+                  fullWidth
+                />
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button type="submit" variant="contained" color="primary">
                     {editingId ? 'Atualizar' : 'Salvar'}
-                  </button>
+                  </Button>
                   {editingId && (
-                    <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                    <Button type="button" variant="outlined" onClick={resetForm}>
                       Cancelar
-                    </button>
+                    </Button>
                   )}
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">
-              <h5>Lista de Reservas</h5>
-            </div>
-            <div className="card-body">
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Lista de Reservas
+              </Typography>
               {reservations.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>Imóvel</th>
-                        <th>Hóspede</th>
-                        <th>Período</th>
-                        <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Imóvel</TableCell>
+                        <TableCell>Hóspede</TableCell>
+                        <TableCell>Período</TableCell>
+                        <TableCell>Ações</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
                       {reservations.map(reservation => {
                         const property = properties.find(p => p.id === reservation.propertyId);
                         return (
-                          <tr key={reservation.id}>
-                            <td>{property ? property.title : 'N/A'}</td>
-                            <td>{reservation.guestName}</td>
-                            <td>{new Date(reservation.startDate).toLocaleDateString()} - {new Date(reservation.endDate).toLocaleDateString()}</td>
-                            <td>
-                              <div className="d-flex gap-2">
-                                <button
-                                  className="btn btn-sm btn-warning"
+                          <TableRow key={reservation.id}>
+                            <TableCell>{property ? property.title : 'N/A'}</TableCell>
+                            <TableCell>{reservation.guestName}</TableCell>
+                            <TableCell>
+                              {new Date(reservation.startDate).toLocaleDateString()} - {new Date(reservation.endDate).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  color="secondary"
                                   onClick={() => handleEdit(reservation)}
                                 >
                                   Editar
-                                </button>
-                                <button
-                                  className="btn btn-sm btn-danger"
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  color="error"
                                   onClick={() => reservation.id && handleDelete(reservation.id)}
                                 >
                                   Excluir
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
+                                </Button>
+                              </Box>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
-                    </tbody>
-                  </table>
-                </div>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               ) : (
-                <p>Nenhuma reserva cadastrada.</p>
+                <Typography>Nenhuma reserva cadastrada.</Typography>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

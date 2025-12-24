@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentogram Wiki - Guia de Uso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar { height: 100vh; overflow-y: auto; }
+        .content { padding: 20px; }
+        .breadcrumb { margin-bottom: 20px; }
+        .nav-link { color: #007bff; }
+        .nav-link:hover { color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <h5 class="pt-3 px-3">Rentogram Wiki</h5>
+                    <ul class="nav flex-column px-3">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Página Inicial</a></li>
+                        <li class="nav-item"><a class="nav-link" href="architecture.html">Arquitetura do Sistema</a></li>
+                        <li class="nav-item"><a class="nav-link" href="execution-flows.html">Fluxos de Execução</a></li>
+                        <li class="nav-item"><a class="nav-link" href="data-models.html">Modelos de Dados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="configuration.html">Configuração</a></li>
+                        <li class="nav-item"><a class="nav-link" href="api-reference.html">Referência da API</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="usage-guide.html">Guia de Uso</a></li>
+                        <li class="nav-item"><a class="nav-link" href="risks-limitations.html">Riscos e Limitações</a></li>
+                        <li class="nav-item"><a class="nav-link" href="governance.html">Governança</a></li>
+                        <li class="nav-item"><a class="nav-link" href="glossary.html">Glossário</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tags.html">Tags</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Página Inicial</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Guia de Uso</li>
+                    </ol>
+                </nav>
+
+                <h1>Guia de Uso</h1>
+                <p>Este guia explica como usar o sistema Rentogram para gerenciar propriedades e reservas.</p>
+
+                <h2 id="getting-started">Como Começar</h2>
+                <ol>
+                    <li>Execute o script <code>start.bat</code> para iniciar o sistema.</li>
+                    <li>Acesse o frontend em <code>http://localhost:5173</code>.</li>
+                    <li>Use a barra de navegação para alternar entre Propriedades e Reservas.</li>
+                </ol>
+
+                <h2 id="managing-properties">Gerenciando Propriedades</h2>
+                <h3>Adicionando uma Propriedade</h3>
+                <ol>
+                    <li>Navegue para a página "Properties".</li>
+                    <li>Clique em "Adicionar Propriedade".</li>
+                    <li>Preencha os campos: título, endereço, preço, etc.</li>
+                    <li>Clique em "Salvar".</li>
+                </ol>
+
+                <h3>Editando uma Propriedade</h3>
+                <ol>
+                    <li>Na lista de propriedades, clique em "Editar" na propriedade desejada.</li>
+                    <li>Modifique os campos necessários.</li>
+                    <li>Clique em "Salvar".</li>
+                </ol>
+
+                <h2 id="managing-reservations">Gerenciando Reservas</h2>
+                <h3>Criando uma Reserva</h3>
+                <ol>
+                    <li>Navegue para a página "Reservations".</li>
+                    <li>Clique em "Adicionar Reserva".</li>
+                    <li>Selecione uma propriedade existente.</li>
+                    <li>Preencha informações do hóspede e datas.</li>
+                    <li>Clique em "Salvar".</li>
+                </ol>
+
+                <h2 id="dashboard">Dashboard</h2>
+                <p>A página inicial mostra um dashboard com estatísticas básicas e visualização de calendário.</p>
+
+                <h2 id="tags">Tags</h2>
+                <p><span class="badge bg-primary">uso</span> <span class="badge bg-secondary">interface</span> <span class="badge bg-success">crud</span> <span class="badge bg-danger">dashboard</span></p>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

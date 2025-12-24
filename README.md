@@ -2,6 +2,10 @@
 
 O Rentogram é um sistema completo para gestão de propriedades e reservas, composto por um backend em Node.js e um frontend em React. Esta documentação abrange a configuração, uso e detalhes técnicos do sistema.
 
+## 📖 Documentação Completa
+
+Para documentação técnica detalhada, incluindo arquitetura, fluxos de execução, modelos de dados, referência da API e governança, consulte nossa [Wiki Completa](./wiki/index.html).
+
 ## Índice
 
 1. [Visão Geral do Sistema](#visão-geral-do-sistema)

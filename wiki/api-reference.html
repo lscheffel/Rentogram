@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentogram Wiki - Referência da API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar { height: 100vh; overflow-y: auto; }
+        .content { padding: 20px; }
+        .breadcrumb { margin-bottom: 20px; }
+        .nav-link { color: #007bff; }
+        .nav-link:hover { color: #0056b3; }
+        .method { font-weight: bold; }
+        .method.GET { color: #28a745; }
+        .method.POST { color: #007bff; }
+        .method.PUT { color: #ffc107; }
+        .method.DELETE { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <h5 class="pt-3 px-3">Rentogram Wiki</h5>
+                    <ul class="nav flex-column px-3">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Página Inicial</a></li>
+                        <li class="nav-item"><a class="nav-link" href="architecture.html">Arquitetura do Sistema</a></li>
+                        <li class="nav-item"><a class="nav-link" href="execution-flows.html">Fluxos de Execução</a></li>
+                        <li class="nav-item"><a class="nav-link" href="data-models.html">Modelos de Dados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="configuration.html">Configuração</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="api-reference.html">Referência da API</a></li>
+                        <li class="nav-item"><a class="nav-link" href="usage-guide.html">Guia de Uso</a></li>
+                        <li class="nav-item"><a class="nav-link" href="risks-limitations.html">Riscos e Limitações</a></li>
+                        <li class="nav-item"><a class="nav-link" href="governance.html">Governança</a></li>
+                        <li class="nav-item"><a class="nav-link" href="glossary.html">Glossário</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tags.html">Tags</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Página Inicial</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Referência da API</li>
+                    </ol>
+                </nav>
+
+                <h1>Referência da API</h1>
+                <p>Base URL: <code>http://localhost:3000/api</code></p>
+
+                <h2 id="properties">Propriedades</h2>
+
+                <h3>GET /properties</h3>
+                <p><span class="method GET">GET</span> Lista todas as propriedades</p>
+                <p><strong>Resposta:</strong> 200 OK - Array de objetos Property</p>
+
+                <h3>GET /properties/:id</h3>
+                <p><span class="method GET">GET</span> Obtém propriedade por ID</p>
+                <p><strong>Parâmetros:</strong> id (integer)</p>
+                <p><strong>Resposta:</strong> 200 OK - Objeto Property | 404 Not Found</p>
+
+                <h3>POST /properties</h3>
+                <p><span class="method POST">POST</span> Cria nova propriedade</p>
+                <p><strong>Corpo:</strong></p>
+                <pre><code>{
+  "title": "string",
+  "description": "string",
+  "address": "string",
+  "price_per_night": number,
+  "bedrooms": integer,
+  "bathrooms": integer,
+  "max_guests": integer,
+  "amenities": "string",
+  "image_url": "string"
+}</code></pre>
+                <p><strong>Resposta:</strong> 201 Created - Objeto Property criado</p>
+
+                <h3>PUT /properties/:id</h3>
+                <p><span class="method PUT">PUT</span> Atualiza propriedade</p>
+                <p><strong>Parâmetros:</strong> id (integer)</p>
+                <p><strong>Corpo:</strong> Mesmo que POST</p>
+                <p><strong>Resposta:</strong> 200 OK - Objeto Property atualizado</p>
+
+                <h3>DELETE /properties/:id</h3>
+                <p><span class="method DELETE">DELETE</span> Exclui propriedade</p>
+                <p><strong>Parâmetros:</strong> id (integer)</p>
+                <p><strong>Resposta:</strong> 204 No Content</p>
+
+                <h2 id="reservations">Reservas</h2>
+
+                <h3>GET /reservations</h3>
+                <p><span class="method GET">GET</span> Lista todas as reservas</p>
+                <p><strong>Resposta:</strong> 200 OK - Array de objetos Reservation</p>
+
+                <h3>GET /reservations/:id</h3>
+                <p><span class="method GET">GET</span> Obtém reserva por ID</p>
+                <p><strong>Parâmetros:</strong> id (integer)</p>
+                <p><strong>Resposta:</strong> 200 OK - Objeto Reservation</p>
+
+                <h3>GET /reservations/property/:id</h3>
+                <p><span class="method GET">GET</span> Lista reservas por propriedade</p>
+                <p><strong>Parâmetros:</strong> id (integer) - ID da propriedade</p>
+                <p><strong>Resposta:</strong> 200 OK - Array de objetos Reservation</p>
+
+                <h3>POST /reservations</h3>
+                <p><span class="method POST">POST</span> Cria nova reserva</p>
+                <p><strong>Corpo:</strong></p>
+                <pre><code>{
+  "property_id": integer,
+  "guest_name": "string",
+  "guest_email": "string",
+  "check_in_date": "YYYY-MM-DD",
+  "check_out_date": "YYYY-MM-DD",
+  "total_price": number
+}</code></pre>
+                <p><strong>Resposta:</strong> 201 Created - Objeto Reservation criado</p>
+
+                <h3>PUT /reservations/:id</h3>
+                <p><span class="method PUT">PUT</span> Atualiza reserva</p>
+                <p><strong>Parâmetros:</strong> id (integer)</p>
+                <p><strong>Corpo:</strong> Mesmo que POST</p>
+                <p><strong>Resposta:</strong> 200 OK - Objeto Reservation atualizado</p>
+
+                <h3>DELETE /reservations/:id</h3>
+                <p><span class="method DELETE">DELETE</span> Exclui reserva</p>
+                <p><strong>Parâmetros:</strong> id (integer)</p>
+                <p><strong>Resposta:</strong> 204 No Content</p>
+
+                <h2 id="error-responses">Respostas de Erro</h2>
+                <ul>
+                    <li><strong>400 Bad Request:</strong> Dados inválidos ou validação falhou</li>
+                    <li><strong>404 Not Found:</strong> Recurso não encontrado</li>
+                    <li><strong>500 Internal Server Error:</strong> Erro interno do servidor</li>
+                </ul>
+
+                <h2 id="tags">Tags</h2>
+                <p><span class="badge bg-primary">api</span> <span class="badge bg-secondary">rest</span> <span class="badge bg-success">endpoints</span> <span class="badge bg-danger">http</span></p>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

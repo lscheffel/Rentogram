@@ -51,6 +51,14 @@ function initializeDatabase() {
         FOREIGN KEY (property_id) REFERENCES properties(id)
       )
     `);
+
+    // Criação de índices para otimização
+    db.run(`CREATE INDEX IF NOT EXISTS idx_properties_address ON properties(address)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_properties_price ON properties(price_per_night)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_reservations_property_id ON reservations(property_id)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_reservations_status ON reservations(status)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_reservations_check_in ON reservations(check_in_date)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_reservations_check_out ON reservations(check_out_date)`);
   });
 }
 

@@ -1,4 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  List,
+  ListItem,
+  ListItemText,
+  CircularProgress,
+  Alert,
+  Box,
+} from '@mui/material';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -39,8 +52,17 @@ const Home: React.FC = () => {
         const propertiesData = await propertiesResponse.json();
         const reservationsData = await reservationsResponse.json();
 
+        // Map snake_case to camelCase
+        const mappedReservations = reservationsData.map((res: any) => ({
+          id: res.id,
+          propertyId: res.property_id,
+          startDate: res.check_in_date,
+          endDate: res.check_out_date,
+          guestName: res.guest_name,
+        }));
+
         setProperties(propertiesData);
-        setReservations(reservationsData);
+        setReservations(mappedReservations);
         setLoading(false);
       } catch (err) {
         setError('Failed to load data. Please try again later.');
@@ -74,90 +96,101 @@ const Home: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center mt-5">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Carregando...</span>
-        </div>
-      </div>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="alert alert-danger" role="alert">
+      <Alert severity="error" sx={{ mb: 2 }}>
         {error}
-      </div>
+      </Alert>
     );
   }
 
   return (
-    <div>
-      <h1 className="mb-4">Dashboard</h1>
-      <div className="row">
-        <div className="col-md-8">
-          <div className="card">
-            <div className="card-header">
-              <h5>Calendário de Reservas</h5>
-            </div>
-            <div className="card-body">
-              <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                locale={ptBrLocale}
-                events={calendarEvents}
-                height={600}
-                eventClick={(info) => {
-                  alert(`Reserva: ${info.event.title}\nPeríodo: ${info.event.start?.toLocaleDateString()} a ${info.event.end?.toLocaleDateString()}`);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="card mb-4">
-            <div className="card-header">
-              <h5>Estatísticas</h5>
-            </div>
-            <div className="card-body">
-              <div className="d-flex justify-content-between mb-3">
-                <span>Total de Imóveis</span>
-                <span className="badge bg-primary">{properties.length}</span>
-              </div>
-              <div className="d-flex justify-content-between mb-3">
-                <span>Total de Reservas</span>
-                <span className="badge bg-success">{reservations.length}</span>
-              </div>
-              <div className="d-flex justify-content-between">
-                <span>Taxa de Ocupação</span>
-                <span className="badge bg-warning">{calculateOccupancyRate()}%</span>
-              </div>
-            </div>
-          </div>
-          <div className="card">
-            <div className="card-header">
-              <h5>Próximas Reservas</h5>
-            </div>
-            <div className="card-body">
+    <Box>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Dashboard
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Calendário de Reservas
+              </Typography>
+              <Box sx={{ height: 600 }}>
+                <FullCalendar
+                  plugins={[dayGridPlugin, interactionPlugin]}
+                  initialView="dayGridMonth"
+                  locale={ptBrLocale}
+                  events={calendarEvents}
+                  height="100%"
+                  eventClick={(info) => {
+                    alert(`Reserva: ${info.event.title}\nPeríodo: ${info.event.start?.toLocaleDateString()} a ${info.event.end?.toLocaleDateString()}`);
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Estatísticas
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Typography>Total de Imóveis</Typography>
+                <Chip label={properties.length} color="primary" />
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Typography>Total de Reservas</Typography>
+                <Chip label={reservations.length} color="secondary" />
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography>Taxa de Ocupação</Typography>
+                <Chip label={`${calculateOccupancyRate()}%`} color="warning" />
+              </Box>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Próximas Reservas
+              </Typography>
               {getUpcomingReservations().length > 0 ? (
-                <div className="list-group">
+                <List>
                   {getUpcomingReservations().map(reservation => (
-                    <div key={reservation.id} className="list-group-item">
-                      <div className="d-flex w-100 justify-content-between">
-                        <h6 className="mb-1">{reservation.guestName}</h6>
-                        <small>{new Date(reservation.startDate).toLocaleDateString()}</small>
-                      </div>
-                      <p className="mb-1">Imóvel ID: {reservation.propertyId}</p>
-                    </div>
+                    <ListItem key={reservation.id} divider>
+                      <ListItemText
+                        primary={reservation.guestName}
+                        secondary={
+                          <>
+                            <Typography variant="body2" component="span">
+                              Imóvel ID: {reservation.propertyId}
+                            </Typography>
+                            <br />
+                            <Typography variant="caption" color="text.secondary">
+                              {new Date(reservation.startDate).toLocaleDateString()}
+                            </Typography>
+                          </>
+                        }
+                      />
+                    </ListItem>
                   ))}
-                </div>
+                </List>
               ) : (
-                <p>Nenhuma reserva próxima.</p>
+                <Typography>Nenhuma reserva próxima.</Typography>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

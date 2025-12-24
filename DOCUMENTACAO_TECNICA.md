@@ -681,23 +681,38 @@ Properties (1) ┬─┬ Reservations (N)
 
 ### Testes Atuais
 
-- Não há testes automatizados implementados
+O sistema implementa testes automatizados usando Jest como framework de testes, com Supertest para testes de integração da API. A configuração inclui:
 
-### Testes Recomendados
+- **Cobertura de código:** Thresholds definidos em 80% para branches, funções, linhas e statements
+- **Estrutura de testes:** Localizada em `tests/` com subdiretórios para controladores, middlewares e modelos
+- **Setup:** Arquivo `tests/setup.js` para configuração inicial
+- **Comandos disponíveis:**
+  - `npm test`: Executa todos os testes
+  - `npm run test:coverage`: Executa testes com relatório de cobertura
+
+#### Testes Implementados
 
 1. **Backend:**
-   - Testes unitários para modelos e controladores
-   - Testes de integração para endpoints da API
-   - Testes de validação para middlewares
+    - Testes unitários para controladores (propertyController, reservationController)
+    - Testes para middlewares de validação
+    - Testes para modelos de dados
 
 2. **Frontend:**
-   - Testes unitários para componentes
-   - Testes de integração para fluxos de usuário
-   - Testes E2E para cenários completos
+    - Testes ainda não implementados (recomendado para futuras iterações)
 
 3. **Banco de Dados:**
-   - Testes para validação de esquema
-   - Testes para integridade referencial
+    - Validação de esquema através de testes de modelos
+
+### Melhorias de Testes Recomendadas
+
+1. **Frontend:**
+    - Testes unitários para componentes React
+    - Testes de integração para rotas e interações
+    - Testes E2E com ferramentas como Cypress
+
+2. **Integração:**
+    - Testes de ponta a ponta cobrindo fluxos completos
+    - Testes de performance e carga
 
 ## Implantação
 
